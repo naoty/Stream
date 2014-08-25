@@ -30,4 +30,10 @@ public class Stream<T> {
         subscribe { message in mappedStream.publish(function(message)) }
         return mappedStream
     }
+    
+    public func filter(function: (T) -> Bool) -> Stream<T> {
+        let filteredStream = Stream<T>()
+        subscribe { message in if function(message) { filteredStream.publish(message) } }
+        return filteredStream
+    }
 }

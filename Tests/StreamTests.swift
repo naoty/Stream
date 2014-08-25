@@ -34,6 +34,16 @@ class IntStreamTestCase: XCTestCase {
         stream.publish(3)
         XCTAssertEqual(counter, 14, "")
     }
+    
+    func testFilter() {
+        var counter = 0
+        let filteredStream = stream.filter { message in return message % 2 == 0 }
+        filteredStream.subscribe { message in counter += message }
+        stream.publish(1)
+        stream.publish(2)
+        stream.publish(3)
+        XCTAssertEqual(counter, 2, "")
+    }
 }
 
 class StringStreamTestCase: XCTestCase {
@@ -60,5 +70,15 @@ class StringStreamTestCase: XCTestCase {
         stream.publish("wor")
         stream.publish("ld!")
         XCTAssertEqual(sentence, "HELLO, WORLD!", "")
+    }
+    
+    func testFilter() {
+        var sentence = ""
+        let filteredStream = stream.filter { message in return message.rangeOfString(" ") == nil }
+        filteredStream.subscribe { message in sentence += message }
+        stream.publish("Hello, ")
+        stream.publish("wor")
+        stream.publish("ld!")
+        XCTAssertEqual(sentence, "world!", "")
     }
 }
