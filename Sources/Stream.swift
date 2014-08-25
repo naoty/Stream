@@ -9,19 +9,25 @@
 import Foundation
 
 public class Stream<T> {
-    private var subscribers: [(T) -> Void]
+    private var subscriptions: [(T) -> Void]
     
     public init() {
-        subscribers = []
+        subscriptions = []
     }
     
-    public func subscribe(subscriber: (T) -> Void) {
-        subscribers.append(subscriber)
+    public func subscribe(subscription: (T) -> Void) {
+        subscriptions.append(subscription)
     }
     
     public func publish(message: T) {
-        for subscriber in subscribers {
-            subscriber(message)
+        for subscription in subscriptions {
+            subscription(message)
         }
+    }
+    
+    public func map(function: (T) -> T) -> Stream<T> {
+        let mappedStream = Stream<T>()
+        subscribe { message in mappedStream.publish(function(message)) }
+        return mappedStream
     }
 }

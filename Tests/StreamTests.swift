@@ -10,25 +10,55 @@ import Stream
 import XCTest
 
 class IntStreamTestCase: XCTestCase {
+    var stream: Stream<Int>!
+    
+    override func setUp() {
+        stream = Stream<Int>()
+    }
+    
     func testPublish() {
         var counter = 0
-        let stream = Stream<Int>()
         stream.subscribe { message in counter += message }
         stream.publish(1)
         stream.publish(2)
         stream.publish(3)
         XCTAssertEqual(counter, 6, "")
     }
+    
+    func testMap() {
+        var counter = 0
+        let mappedStream = stream.map { message in return message * message }
+        mappedStream.subscribe { message in counter += message }
+        stream.publish(1)
+        stream.publish(2)
+        stream.publish(3)
+        XCTAssertEqual(counter, 14, "")
+    }
 }
 
 class StringStreamTestCase: XCTestCase {
+    var stream: Stream<String>!
+    
+    override func setUp() {
+        stream = Stream<String>()
+    }
+    
     func testPublish() {
         var sentence = ""
-        let stream = Stream<String>()
         stream.subscribe { message in sentence += message }
         stream.publish("Hello, ")
         stream.publish("wor")
         stream.publish("ld!")
         XCTAssertEqual(sentence, "Hello, world!", "")
+    }
+    
+    func testMap() {
+        var sentence = ""
+        let mappedStream = stream.map { message in return message.uppercaseString }
+        mappedStream.subscribe { message in sentence += message }
+        stream.publish("Hello, ")
+        stream.publish("wor")
+        stream.publish("ld!")
+        XCTAssertEqual(sentence, "HELLO, WORLD!", "")
     }
 }
