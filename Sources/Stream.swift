@@ -36,4 +36,14 @@ public class Stream<T> {
         subscribe { message in if function(message) { filteredStream.publish(message) } }
         return filteredStream
     }
+    
+    public func scan(seed: T, _ function: (T, T) -> T) -> Stream<T> {
+        let accumulatorStream = Stream<T>()
+        var previousMessage = seed
+        subscribe { message in
+            previousMessage = function(previousMessage, message)
+            accumulatorStream.publish(previousMessage)
+        }
+        return accumulatorStream
+    }
 }
