@@ -5,21 +5,17 @@ Swift library to control streams on Functional Reactive Programming model
 ## Demo
 
 ```swift
-var counter = 0
-let intStream = Stream<Int>()
-intStream.subscribe { message in counter += message }
-intStream.publish(1)
-intStream.publish(2)
-intStream.publish(3)
-println(counter) //=> 6
-
-var sentence = ""
-let stringStream = Stream<String>()
-stringStream.subscribe { message in sentence += message }
-stringStream.publish("Hello, ")
-stringStream.publish("wor")
-stringStream.publish("ld!")
-println(sentence) //=> "Hello, world!"
+let stream = Stream<String>()
+let counterStream: Stream<Int> = stream.map({ message in
+    return countElements(message)
+}).scan(0, { previousMessage, message in
+    return previousMessage + message
+}).subscribe({ message in
+    println(message)
+})
+stream.publish("Hello, ") //=> 7
+stream.publish("wor")     //=> 10
+stream.publish("ld!")     //=> 13
 ```
 
 ## Usage

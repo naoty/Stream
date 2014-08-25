@@ -15,8 +15,9 @@ public class Stream<T> {
         subscriptions = []
     }
     
-    public func subscribe(subscription: (T) -> Void) {
+    public func subscribe(subscription: (T) -> Void) -> Stream<T> {
         subscriptions.append(subscription)
+        return self
     }
     
     public func publish(message: T) {
@@ -53,6 +54,7 @@ public class Stream<T> {
             function(message).subscribe { submessage in
                 flatMappedStream.publish(submessage)
             }
+            return
         }
         return flatMappedStream
     }
