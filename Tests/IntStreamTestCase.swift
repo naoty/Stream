@@ -27,7 +27,7 @@ class IntStreamTestCase: XCTestCase {
     
     func testMap() {
         var counter = 0
-        let mappedStream = stream.map { message in return message * message }
+        let mappedStream: Stream<Int> = stream.map { message in return message * message }
         mappedStream.subscribe { message in counter += message }
         stream.publish(1)
         stream.publish(2)
@@ -60,7 +60,7 @@ class IntStreamTestCase: XCTestCase {
     func testFlatMap() {
         let expectation = expectationWithDescription("")
         var counter = 0
-        let flatMappedStream = stream.flatMap { message in
+        let flatMappedStream: Stream<Int> = stream.flatMap { message in
             let metaStream = Stream<Int>()
             NSTimer.scheduledTimerWithTimeInterval(0.1, target: NSBlockOperation(block: {
                 metaStream.publish(message)

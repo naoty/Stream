@@ -25,8 +25,8 @@ public class Stream<T> {
         }
     }
     
-    public func map(function: (T) -> T) -> Stream<T> {
-        let mappedStream = Stream<T>()
+    public func map<U>(function: (T) -> U) -> Stream<U> {
+        let mappedStream = Stream<U>()
         subscribe { message in mappedStream.publish(function(message)) }
         return mappedStream
     }
@@ -47,8 +47,8 @@ public class Stream<T> {
         return accumulatorStream
     }
     
-    public func flatMap(function: (T) -> Stream<T>) -> Stream<T> {
-        let flatMappedStream = Stream<T>()
+    public func flatMap<U>(function: (T) -> Stream<U>) -> Stream<U> {
+        let flatMappedStream = Stream<U>()
         subscribe { message in
             function(message).subscribe { submessage in
                 flatMappedStream.publish(submessage)

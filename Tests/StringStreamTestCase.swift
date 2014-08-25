@@ -26,13 +26,13 @@ class StringStreamTestCase: XCTestCase {
     }
     
     func testMap() {
-        var sentence = ""
-        let mappedStream = stream.map { message in return message.uppercaseString }
-        mappedStream.subscribe { message in sentence += message }
+        var sentenceLength = 0
+        let mappedStream: Stream<Int> = stream.map { message in return countElements(message) }
+        mappedStream.subscribe { message in sentenceLength += message }
         stream.publish("Hello, ")
         stream.publish("wor")
         stream.publish("ld!")
-        XCTAssertEqual(sentence, "HELLO, WORLD!", "")
+        XCTAssertEqual(sentenceLength, 13, "")
     }
     
     func testFilter() {
@@ -60,18 +60,18 @@ class StringStreamTestCase: XCTestCase {
     
     func testFlatMap() {
         let expectation = expectationWithDescription("")
-        var sentence = ""
-        let flatMappedStream = stream.flatMap { message in
-            let metaStream = Stream<String>()
+        var sentenceLength = 0
+        let flatMappedStream: Stream<Int> = stream.flatMap { message in
+            let metaStream = Stream<Int>()
             NSTimer.scheduledTimerWithTimeInterval(0.1, target: NSBlockOperation(block: {
-                metaStream.publish(message)
+                metaStream.publish(countElements(message))
                 expectation.fulfill()
             }), selector: Selector("main"), userInfo: nil, repeats: false)
             return metaStream
         }
-        flatMappedStream.subscribe { message in sentence += message }
+        flatMappedStream.subscribe { message in sentenceLength += message }
         stream.publish("Hello, world!")
         waitForExpectationsWithTimeout(1, handler: nil)
-        XCTAssertEqual(sentence, "Hello, world!", "")
+        XCTAssertEqual(sentenceLength, 13, "")
     }
 }
