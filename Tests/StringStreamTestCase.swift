@@ -57,4 +57,21 @@ class StringStreamTestCase: XCTestCase {
         stream.publish("a")
         XCTAssertEqual(word, "e", "")
     }
+    
+    func testFlatMap() {
+        let expectation = expectationWithDescription("")
+        var sentence = ""
+        let flatMappedStream = stream.flatMap { message in
+            let metaStream = Stream<String>()
+            NSTimer.scheduledTimerWithTimeInterval(0.1, target: NSBlockOperation(block: {
+                metaStream.publish(message)
+                expectation.fulfill()
+            }), selector: Selector("main"), userInfo: nil, repeats: false)
+            return metaStream
+        }
+        flatMappedStream.subscribe { message in sentence += message }
+        stream.publish("Hello, world!")
+        waitForExpectationsWithTimeout(1, handler: nil)
+        XCTAssertEqual(sentence, "Hello, world!", "")
+    }
 }

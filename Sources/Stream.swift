@@ -46,4 +46,14 @@ public class Stream<T> {
         }
         return accumulatorStream
     }
+    
+    public func flatMap(function: (T) -> Stream<T>) -> Stream<T> {
+        let flatMappedStream = Stream<T>()
+        subscribe { message in
+            function(message).subscribe { submessage in
+                flatMappedStream.publish(submessage)
+            }
+        }
+        return flatMappedStream
+    }
 }
