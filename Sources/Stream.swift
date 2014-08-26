@@ -8,10 +8,10 @@
 
 import Foundation
 
-public class Stream<T> {
+public class Stream<T>: NSObject {
     private var subscriptions: [(T) -> Void]
     
-    public init() {
+    public override init() {
         subscriptions = []
     }
     
@@ -55,6 +55,21 @@ public class Stream<T> {
                 flatMappedStream.publish(submessage)
             }
             return
+        }
+        return flatMappedStream
+    }
+    
+    public func flatMapLatest<U>(function: (T) -> Stream<U>) -> Stream<U> {
+        let flatMappedStream = Stream<U>()
+        var latestStream = Stream<U>()
+        subscribe { message in
+            let currentStream = function(message)
+            latestStream = currentStream
+            latestStream.subscribe { submessage in
+                if latestStream == currentStream {
+                    flatMappedStream.publish(submessage)
+                }
+            }
         }
         return flatMappedStream
     }

@@ -76,6 +76,30 @@ class IntStreamTestCase: XCTestCase {
         XCTAssertEqual(counter, 1, "")
     }
     
+    func testFlatMapLatest() {
+        let expectation = expectationWithDescription("")
+        var fulfilled = false
+        
+        var counter = 0
+        let flatMappedStream: Stream<Int> = stream.flatMapLatest { message in
+            let metaStream = Stream<Int>()
+            NSTimer.scheduledTimerWithTimeInterval(0.1, target: NSBlockOperation(block: {
+                metaStream.publish(message)
+                if !fulfilled {
+                    expectation.fulfill()
+                    fulfilled = true
+                }
+            }), selector: Selector("main"), userInfo: nil, repeats: false)
+            return metaStream
+        }
+        flatMappedStream.subscribe { message in counter += message }
+        stream.publish(1)
+        stream.publish(2)
+        
+        waitForExpectationsWithTimeout(1, handler: nil)
+        XCTAssertEqual(counter, 2, "")
+    }
+    
     func testThrottle() {
         var expectation = expectationWithDescription("")
         
