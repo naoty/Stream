@@ -74,18 +74,28 @@ public class Stream<T>: NSObject {
         return flatMappedStream
     }
     
-    public func throttle(milliseconds: NSTimeInterval) -> Stream<T> {
+    public func throttle(seconds: NSTimeInterval) -> Stream<T> {
         let throttledStream = Stream<T>()
         var locked = false
         subscribe { message in
             if !locked {
                 locked = true
                 throttledStream.publish(message)
-                NSTimer.scheduledTimerWithTimeInterval(milliseconds * 1000, target: NSBlockOperation(block: {
+                NSTimer.scheduledTimerWithTimeInterval(seconds, target: NSBlockOperation(block: {
                     locked = false
                 }), selector: Selector("main"), userInfo: nil, repeats: false)
             }
         }
         return throttledStream
+    }
+    
+    public func debounce(seconds: NSTimeInterval) -> Stream<T> {
+        return flatMapLatest { message in
+            let metaStream = Stream<T>()
+            NSTimer.scheduledTimerWithTimeInterval(seconds, target: NSBlockOperation(block: {
+                metaStream.publish(message)
+            }), selector: Selector("main"), userInfo: nil, repeats: false)
+            return metaStream
+        }
     }
 }

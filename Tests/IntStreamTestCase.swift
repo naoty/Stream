@@ -11,14 +11,16 @@ import XCTest
 
 class IntStreamTestCase: XCTestCase {
     var stream: Stream<Int>!
+    var counter: Int = 0
+    var expectation: XCTestExpectation!
     
     override func setUp() {
         stream = Stream<Int>()
+        counter = 0
     }
     
     func testPublish() {
-        var counter = 0
-        stream.subscribe { message in counter += message }
+        stream.subscribe { message in self.counter += message }
         stream.publish(1)
         stream.publish(2)
         stream.publish(3)
@@ -26,9 +28,8 @@ class IntStreamTestCase: XCTestCase {
     }
     
     func testMap() {
-        var counter = 0
         let mappedStream: Stream<Int> = stream.map { message in return message * message }
-        mappedStream.subscribe { message in counter += message }
+        mappedStream.subscribe { message in self.counter += message }
         stream.publish(1)
         stream.publish(2)
         stream.publish(3)
@@ -36,9 +37,8 @@ class IntStreamTestCase: XCTestCase {
     }
     
     func testFilter() {
-        var counter = 0
         let filteredStream = stream.filter { message in return message % 2 == 0 }
-        filteredStream.subscribe { message in counter += message }
+        filteredStream.subscribe { message in self.counter += message }
         stream.publish(1)
         stream.publish(2)
         stream.publish(3)
@@ -80,7 +80,6 @@ class IntStreamTestCase: XCTestCase {
         let expectation = expectationWithDescription("")
         var fulfilled = false
         
-        var counter = 0
         let flatMappedStream: Stream<Int> = stream.flatMapLatest { message in
             let metaStream = Stream<Int>()
             NSTimer.scheduledTimerWithTimeInterval(0.1, target: NSBlockOperation(block: {
@@ -92,7 +91,7 @@ class IntStreamTestCase: XCTestCase {
             }), selector: Selector("main"), userInfo: nil, repeats: false)
             return metaStream
         }
-        flatMappedStream.subscribe { message in counter += message }
+        flatMappedStream.subscribe { message in self.counter += message }
         stream.publish(1)
         stream.publish(2)
         
@@ -103,9 +102,7 @@ class IntStreamTestCase: XCTestCase {
     func testThrottle() {
         var expectation = expectationWithDescription("")
         
-        var counter = 0
-        let throttledStream = stream.throttle(1000)
-        throttledStream.subscribe { message in counter += message }
+        let throttledStream = stream.throttle(1).subscribe { message in self.counter += message }
         
         NSTimer.scheduledTimerWithTimeInterval(0.5, target: NSBlockOperation(block: {
             self.stream.publish(1)
@@ -116,5 +113,20 @@ class IntStreamTestCase: XCTestCase {
         
         waitForExpectationsWithTimeout(1, handler: nil)
         XCTAssertEqual(counter, 1, "")
+    }
+    
+    func testDebounce() {
+        let expectation = expectationWithDescription("")
+        
+        let debouncingStream = stream.debounce(0.1).subscribe { message in
+            self.counter += message
+            expectation.fulfill()
+        }
+        stream.publish(1)
+        stream.publish(2)
+        stream.publish(3)
+        
+        waitForExpectationsWithTimeout(1, handler: nil)
+        XCTAssertEqual(counter, 3, "")
     }
 }
