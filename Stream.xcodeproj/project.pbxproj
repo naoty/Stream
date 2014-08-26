@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		3D2BE08119AB66C600041D9B /* IntStreamTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D2BE07D19AB66A500041D9B /* IntStreamTestCase.swift */; };
-		3D2BE08219AB66DE00041D9B /* StringStreamTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D2BE07F19AB66B300041D9B /* StringStreamTestCase.swift */; };
 		3DC8D36D19AACA0500759E5F /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8D36C19AACA0500759E5F /* Stream.swift */; };
 /* End PBXBuildFile section */
 
@@ -24,7 +23,6 @@
 
 /* Begin PBXFileReference section */
 		3D2BE07D19AB66A500041D9B /* IntStreamTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntStreamTestCase.swift; sourceTree = "<group>"; };
-		3D2BE07F19AB66B300041D9B /* StringStreamTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringStreamTestCase.swift; sourceTree = "<group>"; };
 		3D93E57519AAC8AE0083A920 /* Stream.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Stream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D93E58019AAC8AE0083A920 /* StreamTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StreamTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DC8D36C19AACA0500759E5F /* Stream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
@@ -78,7 +76,6 @@
 			isa = PBXGroup;
 			children = (
 				3D2BE07D19AB66A500041D9B /* IntStreamTestCase.swift */,
-				3D2BE07F19AB66B300041D9B /* StringStreamTestCase.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -197,7 +194,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3D2BE08219AB66DE00041D9B /* StringStreamTestCase.swift in Sources */,
 				3D2BE08119AB66C600041D9B /* IntStreamTestCase.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
