@@ -58,4 +58,19 @@ public class Stream<T> {
         }
         return flatMappedStream
     }
+    
+    public func throttle(milliseconds: NSTimeInterval) -> Stream<T> {
+        let throttledStream = Stream<T>()
+        var locked = false
+        subscribe { message in
+            if !locked {
+                locked = true
+                throttledStream.publish(message)
+                NSTimer.scheduledTimerWithTimeInterval(milliseconds * 1000, target: NSBlockOperation(block: {
+                    locked = false
+                }), selector: Selector("main"), userInfo: nil, repeats: false)
+            }
+        }
+        return throttledStream
+    }
 }
