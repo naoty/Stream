@@ -8,23 +8,44 @@
 
 import Foundation
 
+private enum Status {
+    case Running
+    case Failed
+}
+
 public class Stream<T>: NSObject {
+    private var status: Status = .Running
     private var subscriptions: [(T) -> Void]
+    private var errorHandler: ((NSError) -> Void)?
     
     public override init() {
         subscriptions = []
     }
     
-    public func subscribe(subscription: (T) -> Void) -> Stream<T> {
+    // MARK: - Communicate with streams
+    
+    public func subscribe(subscription: (T) -> Void, onError errorHandler: ((NSError) -> Void)? = nil) -> Stream<T> {
         subscriptions.append(subscription)
+        self.errorHandler = errorHandler
         return self
     }
     
     public func publish(message: T) {
+        if status != .Running {
+            return
+        }
+
         for subscription in subscriptions {
             subscription(message)
         }
     }
+    
+    public func fail(#error: NSError) {
+        self.errorHandler?(error)
+        status = .Failed
+    }
+    
+    // MARK: - Create another stream from a stream
     
     public func map<U>(function: (T) -> U) -> Stream<U> {
         let mappedStream = Stream<U>()

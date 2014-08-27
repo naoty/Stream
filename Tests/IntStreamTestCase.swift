@@ -26,6 +26,15 @@ class IntStreamTestCase: XCTestCase {
         stream.publish(3)
         XCTAssertEqual(counter, 6, "")
     }
+
+    func testFail() {
+        stream.subscribe { message in self.counter += message }
+        stream.publish(1)
+        stream.fail(error: NSError(domain: NSCocoaErrorDomain, code: 1, userInfo: nil))
+        stream.publish(2)
+        stream.publish(3)
+        XCTAssertEqual(counter, 1, "")
+    }
     
     func testMap() {
         let mappedStream: Stream<Int> = stream.map { message in return message * message }
