@@ -8,15 +8,11 @@
 
 import Foundation
 
-private enum Status {
-    case Running
-    case Failed
-}
-
 public class Stream<T>: NSObject {
-    private var status: Status = .Running
     private var subscriptions: [(T) -> Void]
     private var errorHandler: ((NSError) -> Void)?
+    private var completionHandler: ((T) -> Void)?
+    private var completed = false
     
     public override init() {
         subscriptions = []
@@ -24,25 +20,29 @@ public class Stream<T>: NSObject {
     
     // MARK: - Communicate with streams
     
-    public func subscribe(subscription: (T) -> Void, onError errorHandler: ((NSError) -> Void)? = nil) -> Stream<T> {
-        subscriptions.append(subscription)
-        self.errorHandler = errorHandler
+    public func subscribe(subscription: (T) -> Void, onError errorHandler: ((NSError) -> Void)? = nil, onCompleted completionHandler: ((T) -> Void)? = nil) -> Stream<T> {
+        if !completed {
+            subscriptions.append(subscription)
+            self.errorHandler = errorHandler
+            self.completionHandler = completionHandler
+        }
         return self
     }
     
     public func publish(message: T) {
-        if status != .Running {
-            return
-        }
-
         for subscription in subscriptions {
             subscription(message)
         }
     }
     
-    public func fail(#error: NSError) {
-        self.errorHandler?(error)
-        status = .Failed
+    public func fail(error: NSError) {
+        errorHandler?(error)
+    }
+    
+    public func complete(message: T) {
+        completionHandler?(message)
+        subscriptions.removeAll(keepCapacity: false)
+        completed = true
     }
     
     // MARK: - Create another stream from a stream
