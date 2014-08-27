@@ -98,4 +98,22 @@ public class Stream<T>: NSObject {
             return metaStream
         }
     }
+    
+    public func buffer(#seconds: NSTimeInterval) -> Stream<[T]> {
+        let bufferredStream = Stream<[T]>()
+        var messageBuffer: [T] = []
+        var locked = false
+        subscribe { message in
+            messageBuffer.append(message)
+            if !locked {
+                locked = true
+                NSTimer.scheduledTimerWithTimeInterval(seconds, target: NSBlockOperation(block: {
+                    bufferredStream.publish(messageBuffer)
+                    messageBuffer.removeAll()
+                    locked = false
+                }), selector: Selector("main"), userInfo: nil, repeats: false)
+            }
+        }
+        return bufferredStream
+    }
 }

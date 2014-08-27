@@ -129,4 +129,22 @@ class IntStreamTestCase: XCTestCase {
         waitForExpectationsWithTimeout(1, handler: nil)
         XCTAssertEqual(counter, 3, "")
     }
+    
+    func testBufferWithSeconds() {
+        let expectation = expectationWithDescription("")
+        
+        stream.buffer(seconds: 0.3).map({ message in
+            return countElements(message)
+        }).subscribe { message in
+            self.counter = message
+        }
+        
+        self.stream.publish(1)
+        NSTimer.scheduledTimerWithTimeInterval(0.4, target: NSBlockOperation(block: { self.stream.publish(2) }), selector: Selector("main"), userInfo: nil, repeats: false)
+        NSTimer.scheduledTimerWithTimeInterval(0.5, target: NSBlockOperation(block: { self.stream.publish(3) }), selector: Selector("main"), userInfo: nil, repeats: false)
+        NSTimer.scheduledTimerWithTimeInterval(0.8, target: NSBlockOperation(block: { expectation.fulfill() }), selector: Selector("main"), userInfo: nil, repeats: false)
+        
+        waitForExpectationsWithTimeout(1, handler: nil)
+        XCTAssertEqual(counter, 2, "")
+    }
 }
