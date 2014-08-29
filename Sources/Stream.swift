@@ -18,8 +18,6 @@ public class Stream<T>: NSObject {
         subscriptions = []
     }
     
-    // MARK: - Communicate with streams
-    
     public func subscribe(subscription: (T) -> Void, onError errorHandler: ((NSError) -> Void)? = nil, onCompleted completionHandler: ((T) -> Void)? = nil) -> Stream<T> {
         if !completed {
             subscriptions.append(subscription)
@@ -44,9 +42,11 @@ public class Stream<T>: NSObject {
         subscriptions.removeAll(keepCapacity: false)
         completed = true
     }
-    
-    // MARK: - Create another stream from a stream
-    
+}
+
+// MARK: - Create a stream from given function
+
+public extension Stream {
     public func map<U>(function: (T) -> U) -> Stream<U> {
         let mappedStream = Stream<U>()
         subscribe { message in mappedStream.publish(function(message)) }
@@ -94,7 +94,11 @@ public class Stream<T>: NSObject {
         }
         return flatMappedStream
     }
-    
+}
+
+// MARK: - Create a stream from given time
+
+public extension Stream {
     public func throttle(seconds: NSTimeInterval) -> Stream<T> {
         let throttledStream = Stream<T>()
         var locked = false

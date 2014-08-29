@@ -19,8 +19,6 @@ class IntStreamTestCase: XCTestCase {
         counter = 0
     }
     
-    // MARK: - Communicate with streams
-    
     func testPublish() {
         stream.subscribe { message in self.counter += message }
         stream.publish(1)
@@ -46,9 +44,11 @@ class IntStreamTestCase: XCTestCase {
         stream.publish(3)
         XCTAssertEqual(counter, -1, "")
     }
-    
-    // MARK: - Create another stream from a stream
-    
+}
+
+// MARK: - Create a stream from given function
+
+extension IntStreamTestCase {
     func testMap() {
         let mappedStream: Stream<Int> = stream.map { message in return message * message }
         mappedStream.subscribe { message in self.counter += message }
@@ -120,7 +120,11 @@ class IntStreamTestCase: XCTestCase {
         waitForExpectationsWithTimeout(1, handler: nil)
         XCTAssertEqual(counter, 2, "")
     }
-    
+}
+
+// MARK: - Create a stream from given time
+
+extension IntStreamTestCase {
     func testThrottle() {
         var expectation = expectationWithDescription("")
         
