@@ -174,3 +174,16 @@ extension IntStreamTestCase {
         XCTAssertEqual(counter, 2, "")
     }
 }
+
+// MARK: - Create a stream from another stream
+
+extension IntStreamTestCase {
+    func testMerge() {
+        let anotherStream = Stream<Int>()
+        stream.merge(anotherStream).subscribe { message in self.counter += message }
+        stream.publish(1)
+        anotherStream.publish(2)
+        stream.publish(3)
+        XCTAssertEqual(counter, 6, "")
+    }
+}

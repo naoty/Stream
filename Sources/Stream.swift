@@ -142,3 +142,14 @@ public extension Stream {
         return bufferredStream
     }
 }
+
+// MARK: - Create a stream from another stream
+
+public extension Stream {
+    public func merge(anotherStream: Stream<T>) -> Stream<T> {
+        let mergedStream = Stream<T>()
+        self.subscribe { message in mergedStream.publish(message) }
+        anotherStream.subscribe { message in mergedStream.publish(message) }
+        return mergedStream
+    }
+}
